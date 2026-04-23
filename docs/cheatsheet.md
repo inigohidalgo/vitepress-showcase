@@ -279,6 +279,12 @@ Ranges, VS Code regions, and header-anchored slices all work.
 
 ### Math (opt-in)
 
+Install the renderer, then flip the flag:
+
+```bash
+npm add -D markdown-it-mathjax3
+```
+
 ```ts
 // .vitepress/config.ts
 export default {
@@ -286,7 +292,27 @@ export default {
 }
 ```
 
-Then `$\text{MSE} = \frac{1}{n}\sum (y_i - \hat{y}_i)^2$` renders inline.
+Source syntax (what you type):
+
+```md
+Inline: $\text{MSE} = \frac{1}{n}\sum (y_i - \hat{y}_i)^2$
+
+Display:
+
+$$
+\text{softmax}(z)_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}}
+$$
+```
+
+Rendered on this page (live):
+
+Inline: $\text{MSE} = \frac{1}{n}\sum (y_i - \hat{y}_i)^2$
+
+Display:
+
+$$
+\text{softmax}(z)_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}}
+$$
 
 ## Vue in Markdown <Badge type="tip" text="differentiator" />
 
