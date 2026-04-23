@@ -1,0 +1,19 @@
+:root {
+  /* Reserve space for the ShowcaseBanner (layout-top slot) on first paint,
+     before the ResizeObserver in ShowcaseBanner.vue writes the real height. */
+  --vp-layout-top-height: 32px;
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #0b5fff 30%, #41d1ff);
+
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    #0b5fff 50%,
+    #41d1ff 50%
+  );
+  --vp-home-hero-image-filter: blur(56px);
+}
+
+.dark {
+  --vp-home-hero-name-background: linear-gradient(120deg, #5b8cff 30%, #7ae6ff);
+}
