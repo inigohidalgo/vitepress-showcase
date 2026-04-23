@@ -231,7 +231,32 @@ databricks sql queries list --output JSON | jq '.[] | .name'
 
 ### File imports <Badge type="tip" text="differentiator" />
 
-Pull a snippet from anywhere in the repo with `<<< @/path{lines}`. Region names and VS Code `#region` markers are supported, and the displayed language follows the file extension. Use sparingly — when docs live in the same repo as the code, it keeps examples in sync with reality.
+Pull a snippet from anywhere in the repo with `<<< @/path`. Line ranges (`{3-10}`), header anchors (`#heading-slug`), and VS Code `#region` markers (`#region-name`) are all supported. The displayed language follows the file extension. Paths starting with `@` resolve against `srcDir`; plain relative paths resolve against the importing `.md` file, so docs can reach out into sibling source trees.
+
+Mark a block in your source:
+
+```python
+# region chunk_text
+def chunk_text(...) -> Generator[Chunk, None, None]:
+    ...
+# endregion chunk_text
+```
+
+Then pull it into the docs:
+
+```md
+<<< ../src/vitepress_showcase/pipelines.py#chunk_text
+```
+
+Rendered inline below from the real `src/vitepress_showcase/pipelines.py` in this repo — if the signature changes, the docs rebuild with the new one:
+
+<<< ../src/vitepress_showcase/pipelines.py#chunk_text
+
+And the `Chunk` dataclass it yields:
+
+<<< ../src/vitepress_showcase/pipelines.py#Chunk
+
+**Why use this for an internal docs site**: snippets copy-pasted into prose drift the moment someone refactors. Importing keeps the docs honest — the "runbook walks through this function" section will always show the function as it is, not as it was.
 
 ### Markdown includes
 
