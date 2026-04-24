@@ -352,6 +352,70 @@ Browser-only bits:
 </ClientOnly>
 ```
 
+<script setup lang="ts">
+import { graph, scrubStyles } from './_mermaid_demo'
+</script>
+
+## Mermaid with ad-hoc styling <Badge type="tip" text="differentiator" />
+
+Mermaid via a thin Vue wrapper (`MermaidDiagram.vue`) instead of `vitepress-plugin-mermaid`'s fenced-block flow. Two payoffs:
+
+- **Dark-mode-aware theming for free** — mermaid is initialized with `theme: 'base'` and a `themeCSS` string that references `--vp-c-*` site tokens. Mermaid bakes that string into each rendered SVG's inner `<style>`, and `var(--vp-c-*)` resolves at paint time, so flipping `:root.dark` re-themes every diagram instantly without a re-render.
+- **Per-instance overrides** — a `:styles` prop is concatenated onto the global `themeCSS` before render, so one-off emphasis stays scoped to that one diagram.
+
+### Three tiers of styling
+
+Reach for the lowest tier that does the job:
+
+| Tier | Where | When |
+|---|---|---|
+| **1 — `themeCSS` + `--vp-mermaid-*` tokens** | `MermaidDiagram.vue` + `custom.css` | Default look of every diagram, site-wide |
+| **2 — global semantic classes** | `custom.css` (e.g. `.node.highlight`) | Reused across ≥2 diagrams |
+| **3 — per-instance `:styles` prop** | Inline in the `.md` file | One-off emphasis on a single diagram |
+
+### Live example
+
+The ingestion graph below uses all three tiers. `Ingest` and `Publish` get the default Tier 1 look. `Classify` carries the global Tier 2 `highlight` class. `PII Scrub` gets a one-off Tier 3 override via the `:styles` prop — no new CSS file, no new global class.
+
+<MermaidDiagram :source="graph" :styles="scrubStyles" />
+
+The graph source lives in a sibling `.ts` file so both `<script setup>` (for the live render above) and `<<<` imports (for the snippets below) see the same text:
+
+<<< ./_mermaid_demo.ts#graph
+
+The Tier 3 override for the `PII Scrub` node — just a CSS string, passed as a prop:
+
+<<< ./_mermaid_demo.ts#scrubStyles
+
+And the markdown that renders the live diagram is three lines:
+
+```md
+<script setup lang="ts">
+import { graph, scrubStyles } from './_mermaid_demo'
+</script>
+
+<MermaidDiagram :source="graph" :styles="scrubStyles" />
+```
+
+### Tier 1 — the site-wide `themeCSS`
+
+Baked into the component as a string so mermaid injects it inside every rendered SVG. Note `!important` throughout (mermaid's base theme emits inline `style=""` on nodes that would otherwise win) and the dual `color` + `fill` on label selectors (labels are rendered as HTML `<foreignObject>` with `htmlLabels: true`, and `fill` is a no-op on HTML):
+
+<<< ./.vitepress/theme/components/MermaidDiagram.vue#themeCSS
+
+### Tier 2 — global semantic classes
+
+Defined once in `custom.css`, used across any number of diagrams by tagging nodes with `classDef foo` + `class X foo` in the mermaid source:
+
+<<< ./.vitepress/theme/custom.css#mermaid-tier2
+
+### Gotchas
+
+- **HTML labels** — with `flowchart.htmlLabels: true` (the default), labels are `<foreignObject><div class="label"><p>…</p></div></foreignObject>`. `fill` does not apply to HTML, only `color` does, and it has to cascade. Target both `.label, .label *` (HTML) **and** `text, tspan` (SVG) with both properties.
+- **`!important` is a composability tax** — mermaid auto-prefixes every `themeCSS` selector with the SVG's `#id`, giving Tier 1 specificity `(0,1,1,1)`. Anything you tag `!important` in Tier 1 becomes unbeatable from `custom.css` (which can't match an id it doesn't know). The split we use here: shapes (rect/polygon/stroke) are plain so Tier 2 can override them; **labels are `!important`** because mermaid's own `.nodeLabel` rule is `!important` and a non-important rule loses to it (pink labels). Consequence: Tier 2 in `custom.css` can't recolor labels — use Tier 3 (`:styles`) for that, since it concatenates onto themeCSS and gets the same id-prefix.
+- **Don't set colors via `themeVariables`** — they're baked in as hex strings at init time and ignore dark-mode toggles. Keep `themeVariables` to non-color things like `fontFamily`.
+- **Don't write `classDef highlight fill:#abc`** — mermaid compiles that to inline `style=""`, which loses to the `!important` rules above. Use `classDef` as a semantic tag (no colors) and style the resulting class via Tier 2 or Tier 3.
+
 ## Frontmatter
 
 Global keys (any layout):

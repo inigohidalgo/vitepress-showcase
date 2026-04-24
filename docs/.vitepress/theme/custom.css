@@ -17,3 +17,40 @@
 .dark {
   --vp-home-hero-name-background: linear-gradient(120deg, #5b8cff 30%, #7ae6ff);
 }
+
+/* #region mermaid-tier1 */
+/* Tier 1 — mermaid tokens. Mapped onto VitePress semantic colors so dark
+   mode re-themes every diagram automatically at paint time. */
+:root {
+  --vp-mermaid-node-bg: var(--vp-c-bg-soft);
+  --vp-mermaid-node-border: var(--vp-c-divider);
+  --vp-mermaid-node-text: var(--vp-c-text-1);
+
+  --vp-mermaid-cluster-bg: var(--vp-c-bg-alt);
+  --vp-mermaid-cluster-border: var(--vp-c-divider);
+  --vp-mermaid-cluster-text: var(--vp-c-text-2);
+
+  --vp-mermaid-edge: var(--vp-c-text-2);
+  --vp-mermaid-edge-text: var(--vp-c-text-1);
+  --vp-mermaid-edge-label-bg: var(--vp-c-bg);
+}
+/* #endregion mermaid-tier1 */
+
+/* #region mermaid-tier2 */
+/* Tier 2 — global semantic classes. Tag a node with `classDef highlight`
+   and `class X highlight` in the mermaid source to pick these up. */
+.vp-doc .vp-mermaid-diagram .node.highlight rect,
+.vp-doc .vp-mermaid-diagram .node.highlight polygon {
+  fill: var(--vp-c-brand-soft) !important;
+  stroke: var(--vp-c-brand-1) !important;
+}
+.vp-doc .vp-mermaid-diagram .node.warning rect,
+.vp-doc .vp-mermaid-diagram .node.warning polygon {
+  fill: var(--vp-c-warning-soft) !important;
+  stroke: var(--vp-c-warning-1) !important;
+}
+
+/* Tier 2 only controls shape fill/stroke — labels stay on Tier 1's default
+   (--vp-mermaid-node-text) for readability. Override per-instance via Tier 3
+   (:styles prop) if you need a colored label on a specific diagram. */
+/* #endregion mermaid-tier2 */
