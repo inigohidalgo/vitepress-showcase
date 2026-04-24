@@ -4,6 +4,7 @@ title: Changelog
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { withBase } from 'vitepress'
 import { data as entries } from './entries.data.ts'
 
 const grouped = computed(() => {
@@ -27,7 +28,7 @@ A single `createContentLoader` scans `docs/changelog/2*-*.md`, drops anything ma
   <article v-for="e in items" :key="e.url" class="cl-entry">
     <header class="cl-head">
       <h3 class="cl-title">
-        <a :href="e.url">{{ e.title }}</a>
+        <a :href="withBase(e.url)">{{ e.title }}</a>
       </h3>
       <div class="cl-meta">
         <time>{{ e.date }}</time>
